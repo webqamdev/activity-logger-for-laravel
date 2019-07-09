@@ -9,7 +9,8 @@ The `webqam/activity_logger` package automatically log model changes from users.
 You can install the package via composer:
 
 ```bash
-#TODO: Test & fill me !
+composer config repositories.activity-logger git git@gitlab.webqam.fr:webqam/boilerplates/activity-logger-for-laravel.git
+composer require webqam/activity-logger
 ```
 
 The package will automatically register itself.
