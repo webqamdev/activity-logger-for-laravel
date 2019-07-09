@@ -65,7 +65,7 @@ class ActivityLoggerServiceProvider extends ServiceProvider
     {
         // Get config
         $name  = config('activitylogger.channel.name', 'user');
-        $path  = config('activitylogger.channel.path', storage_path('logs/user.log'));
+        $path  = config('activitylogger.channel.path', storage_path('logs/activity.log'));
         $days  = config('activitylogger.channel.days', 14);
         $level = config('activitylogger.channel.level', 'debug');
 

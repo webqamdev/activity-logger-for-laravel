@@ -13,7 +13,7 @@ return [
      */
 
     'channel' => [
-        'path'  => storage_path('logs/laravel.log'),
+        'path'  => storage_path('logs/activity.log'),
         'level' => 'debug',
         'days'  => 14,
     ],
