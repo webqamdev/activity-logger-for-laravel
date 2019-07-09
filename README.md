@@ -15,7 +15,13 @@ composer require webqam/activity-logger
 
 The package will automatically register itself.
 
-Install [spatie/laravel-activitylog](https://github.com/spatie/laravel-activitylog/blob/master/README.md#installation).
+Configure [spatie/laravel-activitylog](https://github.com/spatie/laravel-activitylog/blob/master/README.md#installation).
+By default, run thoses commands :
+
+```bash
+php artisan vendor:publish --provider="Spatie\Activitylog\ActivitylogServiceProvider" --tag="migrations"
+php artisan migrate
+```
 
 You can optionally publish the config file with:
 
