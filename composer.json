@@ -1,5 +1,5 @@
 {
-    "name": "webqam/activity_logger",
+    "name": "webqam/activity-logger",
     "description": "Log every model creation, edition and deletion.",
     "authors": [
         {
