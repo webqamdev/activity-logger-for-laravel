@@ -31,7 +31,7 @@ php artisan vendor:publish --provider="Webqam\ActivityLogger\ActivityLoggerServi
 
 ## Usage
 
-### Hide a property globally
+### Globally hide a property
 
 Publish config file. Then add entries to `properties_hidden` array.
     
