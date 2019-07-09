@@ -58,6 +58,6 @@ class User extends Model {
     
 ## About
 
-This package using Laravel 5.8 is a plugin for auto-logging 
+This package using Laravel 5.8 is a plugin for auto-logging activities.
 
 Gitlab repository : [Activity logger for Laravel](https://gitlab.webqam.fr/webqam/boilerplates/activity-logger-for-laravel)
