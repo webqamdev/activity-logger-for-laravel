@@ -2,7 +2,7 @@
 
 # Log activity inside your Laravel app
 
-The `webqam/activity_logger` package automatically log model changes from users.
+The `webqam/activity-logger` package automatically log model changes from users.
 
 ## Installation
 
