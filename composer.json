@@ -8,7 +8,7 @@
         }
     ],
     "require": {
-        "spatie/laravel-activitylog": "^3.6"
+        "spatie/laravel-activitylog": "^3.2"
     },
     "autoload": {
         "psr-4": {
