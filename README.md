@@ -2,7 +2,12 @@
 
 # Log activity inside your Laravel app
 
-The `webqam/activity-logger` package automatically log model changes from users.
+The `webqam/activity-logger` package automatically log model changes from users into database and log files.
+
+## Dependencies
+
+This package use [spatie/laravel-activitylog](https://github.com/spatie/laravel-activitylog) to store logs in database.
+Feel free to configure it if needed or just follow [Installation](#installation) instructions.
 
 ## Installation
 
