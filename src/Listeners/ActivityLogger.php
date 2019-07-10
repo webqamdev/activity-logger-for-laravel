@@ -64,6 +64,10 @@ class ActivityLogger
 
     public static function logDatabase(string $action, Model $on, Model $by = null, array $with = null)
     {
+        if (config('activitylogger.to_database', true) === false) {
+            return;
+        }
+
         ActivityLoggerServiceProvider::activity($action)
             ->performedOn($on)
             ->causedBy($by)
