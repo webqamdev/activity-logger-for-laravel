@@ -9,7 +9,7 @@ The `webqam/activity-logger` package automatically log model changes from users.
 You can install the package via composer:
 
 ```bash
-composer config repositories.activity-logger git git@gitlab.webqam.fr:webqam/boilerplates/activity-logger-for-laravel.git
+composer config repositories.activity-logger git git@gitlab.webqam.fr:webqam/laravel-modules/activity-logger-for-laravel.git
 composer require webqam/activity-logger
 ```
 
@@ -60,4 +60,4 @@ class User extends Model {
 
 This package using Laravel 5.8 is a plugin for auto-logging activities.
 
-Gitlab repository : [Activity logger for Laravel](https://gitlab.webqam.fr/webqam/boilerplates/activity-logger-for-laravel)
+Gitlab repository : [Activity logger for Laravel](https://gitlab.webqam.fr/webqam/laravel-modules/activity-logger-for-laravel)
