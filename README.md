@@ -60,6 +60,10 @@ class User extends Model {
      ...
 }
 ```
+
+### Disable logs into database
+
+Add `ACTIVITY_LOGGER_TO_DATABASE=false` to your `.env` file will prevent logger from writing into database.
     
 ## About
 
