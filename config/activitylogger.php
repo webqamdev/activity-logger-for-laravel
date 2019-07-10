@@ -9,7 +9,7 @@ return [
     'enabled' => env('MODEL_ACTIVITY_LOGGER_ENABLED', true),
 
     /*
-     * If set to false, no activities will be saved to the database.
+     * If set to false, no activities will be saved to the database, only in files.
      */
 
     'to_database' => env('ACTIVITY_LOGGER_TO_DATABASE', true),
