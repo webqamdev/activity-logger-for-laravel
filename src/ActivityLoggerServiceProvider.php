@@ -23,6 +23,8 @@ class ActivityLoggerServiceProvider extends ServiceProvider
             __DIR__ . '/../config/activitylogger.php' => config_path('activitylogger.php'),
         ], 'config');
 
+        $this->mergeConfigFrom(__DIR__.'/../config/activitylogger.php', 'activitylogger');
+
         $this->app->bind(Authenticatable::class, config('activitylogger.user_model'));
     }
 
