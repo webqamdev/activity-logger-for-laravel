@@ -2,7 +2,6 @@
 
 namespace Webqam\ActivityLogger\Listeners;
 
-use App\User;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
@@ -11,15 +10,15 @@ use Webqam\ActivityLogger\ActivityLoggerServiceProvider;
 
 class ActivityLogger
 {
-    /** @var User|null */
+    /** @var Authenticatable|null */
     protected $user;
 
     /**
      * Create the event listener.
      *
-     * @param User|null $user
+     * @param Authenticatable|null $user
      */
-    public function __construct(User $user = null)
+    public function __construct(Authenticatable $user = null)
     {
         if (! empty($user->id)) {
             $this->user = $user;
