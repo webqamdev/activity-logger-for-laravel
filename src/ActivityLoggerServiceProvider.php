@@ -2,6 +2,7 @@
 
 namespace Webqam\ActivityLogger;
 
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Monolog\Handler\RotatingFileHandler;
@@ -21,6 +22,10 @@ class ActivityLoggerServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/../config/activitylogger.php' => config_path('activitylogger.php'),
         ], 'config');
+
+        $this->mergeConfigFrom(__DIR__.'/../config/activitylogger.php', 'activitylogger');
+
+        $this->app->bind(Authenticatable::class, config('activitylogger.user_model'));
     }
 
     /**
