@@ -1,6 +1,6 @@
 <?php
 
-namespace Webqam\ActivityLogger;
+namespace Webqamdev\ActivityLogger;
 
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\Event;
@@ -8,7 +8,7 @@ use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvi
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Logger;
 use Spatie\Activitylog\ActivityLogger as SpatieActivityLogger;
-use Webqam\ActivityLogger\Listeners\ActivityLogger;
+use Webqamdev\ActivityLogger\Listeners\ActivityLogger;
 
 class ActivityLoggerServiceProvider extends ServiceProvider
 {
