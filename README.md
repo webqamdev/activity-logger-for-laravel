@@ -1,8 +1,6 @@
-**This document is for internal use only. It is confidential and the property of Webqam. It may not be reproduced or transmitted in whole or in part without the prior written consent of Webqam. / Ce document est à usage interne uniquement. Il est confidentiel et la propriété de Webqam. Il ne peut être reproduit ou transmis en tout ou partie sans l'accord préalable et écrit de Webqam.**
-
 # Log activity inside your Laravel app
 
-The `webqam/activity-logger` package automatically log model changes from users into database and log files.
+The `webqamdev/activity-logger` package automatically log model changes from users into database and log files.
 
 ## Dependencies
 
@@ -14,8 +12,7 @@ Feel free to configure it if needed or just follow [Installation](#installation)
 You can install the package via composer:
 
 ```bash
-composer config repositories.activity-logger git git@gitlab.webqam.fr:webqam/laravel-modules/activity-logger-for-laravel.git
-composer require webqam/activity-logger
+composer require webqamdev/activity-logger
 ```
 
 The package will automatically register itself.
@@ -31,7 +28,7 @@ php artisan migrate
 You can optionally publish the config file with:
 
 ```bash
-php artisan vendor:publish --provider="Webqam\ActivityLogger\ActivityLoggerServiceProvider" --tag="config"
+php artisan vendor:publish --provider="Webqamdev\ActivityLogger\ActivityLoggerServiceProvider" --tag="config"
 ```
 
 ## Usage
@@ -70,3 +67,4 @@ Add `ACTIVITY_LOGGER_TO_DATABASE=false` to your `.env` file will prevent logger 
 This package using Laravel 5.8 is a plugin for auto-logging activities.
 
 Gitlab repository : [Activity logger for Laravel](https://gitlab.webqam.fr/webqam/laravel-modules/activity-logger-for-laravel)
+Github repository : [Activity logger for Laravel](https://github.com/webqamdev/activity-logger-for-laravel)

@@ -1,10 +1,14 @@
 {
-    "name": "webqam/activity-logger",
+    "name": "webqamdev/activity-logger",
     "description": "Log every model creation, edition and deletion.",
     "authors": [
         {
             "name": "Robin Desorme",
             "email": "rdesorme@webqam.fr"
+        },
+        {
+            "name": "Thomas Combe",
+            "email": "tcombe@webqam.fr"
         }
     ],
     "require": {
@@ -12,13 +16,13 @@
     },
     "autoload": {
         "psr-4": {
-            "Webqam\\ActivityLogger\\": "src"
+            "webqamdev\\ActivityLogger\\": "src"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Webqam\\ActivityLogger\\ActivityLoggerServiceProvider"
+                "webqamdev\\ActivityLogger\\ActivityLoggerServiceProvider"
             ]
         }
     }

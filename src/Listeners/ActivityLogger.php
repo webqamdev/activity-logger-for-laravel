@@ -1,12 +1,12 @@
 <?php
 
-namespace Webqam\ActivityLogger\Listeners;
+namespace Webqamdev\ActivityLogger\Listeners;
 
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Activitylog\Models\Activity;
-use Webqam\ActivityLogger\ActivityLoggerServiceProvider;
+use Webqamdev\ActivityLogger\ActivityLoggerServiceProvider;
 
 class ActivityLogger
 {
