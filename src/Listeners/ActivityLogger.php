@@ -73,12 +73,6 @@ class ActivityLogger
         }
     }
 
-    public static function deleteOldLogDatabase() {
-        Activity::query()
-            ->where('created_at', '<=', now()->subDay(config('activitylogger.days_before_delete_log')))
-            ->delete();
-    }
-
     public static function logDatabase(string $action, Model $on, Model $by = null, array $with = null)
     {
         if (config('activitylogger.to_database', true) === false) {
