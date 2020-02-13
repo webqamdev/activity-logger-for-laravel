@@ -30,7 +30,7 @@ return [
     'channel' => [
         'path'  => storage_path('logs/activity.log'),
         'level' => 'debug',
-        'days'  => env('DAYS_BEFORE_DELETE_LOG', 14),
+        'days'  => env('DAYS_BEFORE_DELETE_LOG', 90),
     ],
 
     /*
