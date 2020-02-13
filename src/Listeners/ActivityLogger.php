@@ -64,10 +64,10 @@ class ActivityLogger
 
         self::logDatabase($action, $model, $this->user, $dirty);
         self::logFile($action, $model, $this->user, $dirty);
-        ActivityLogger::purge();
+        ActivityLogger::purgeDatabase();
     }
 
-    private static function purge()
+    private static function purgeDatabase()
     {
         if (Cache::has(ActivityLogger::CACHE_KEY_PURGE) === false) {
             Cache::put(ActivityLogger::CACHE_KEY_PURGE, time(), now()->addDays(ActivityLogger::CACHE_DURATION_IN_DAYS));
