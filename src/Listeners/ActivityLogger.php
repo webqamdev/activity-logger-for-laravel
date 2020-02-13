@@ -13,7 +13,7 @@ class ActivityLogger
 {
 
     const CACHE_DURATION_IN_DAYS  = 1;
-    const FLAG_DELETE_LOGS = 'flag_delete_logs';
+    const CACHE_KEY_PURGE = 'flag_delete_logs';
 
     /** @var Authenticatable|null */
     protected $user;
@@ -69,8 +69,8 @@ class ActivityLogger
 
     private static function purge()
     {
-        if (Cache::has(ActivityLogger::FLAG_DELETE_LOGS) === false) {
-            Cache::put(ActivityLogger::FLAG_DELETE_LOGS, time(), now()->addDays(ActivityLogger::CACHE_DURATION_IN_DAYS));
+        if (Cache::has(ActivityLogger::CACHE_KEY_PURGE) === false) {
+            Cache::put(ActivityLogger::CACHE_KEY_PURGE, time(), now()->addDays(ActivityLogger::CACHE_DURATION_IN_DAYS));
             Activity::query()
                 ->where('created_at', '<=', now()->subDay(config('activitylogger.days_before_delete_log')))
                 ->delete();
