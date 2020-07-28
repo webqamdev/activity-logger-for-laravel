@@ -61,7 +61,7 @@ class ActivityLogger
         self::logFile($action, $model, $this->user, $dirty);
     }
 
-    public static function logDatabase(string $action, Model $on, Model $by = null, array $with = null)
+    public static function logDatabase(string $action, Model $on, Authenticatable $by = null, array $with = null)
     {
         if (config('activitylogger.to_database', true) === false) {
             return;
@@ -74,7 +74,7 @@ class ActivityLogger
             ->log(":causer.email(:causer.id) has $action Model");
     }
 
-    public static function logFile(string $action, Model $on, Model $by = null, array $with = null)
+    public static function logFile(string $action, Model $on, Authenticatable $by = null, array $with = null)
     {
         $by          = optional($by);
         $onClass     = get_class($on);
