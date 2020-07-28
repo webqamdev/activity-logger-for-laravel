@@ -63,7 +63,7 @@ class ActivityLogger
 
     public static function logDatabase(string $action, Model $on, Authenticatable $by = null, array $with = null)
     {
-        if (config('activitylogger.to_database', true) === false) {
+        if (config('activitylogger.to_database', true) === false || !$by instanceof Model) {
             return;
         }
 
