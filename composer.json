@@ -16,13 +16,13 @@
     },
     "autoload": {
         "psr-4": {
-            "webqamdev\\ActivityLogger\\": "src"
+            "Webqamdev\\ActivityLogger\\": "src"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "webqamdev\\ActivityLogger\\ActivityLoggerServiceProvider"
+                "Webqamdev\\ActivityLogger\\ActivityLoggerServiceProvider"
             ]
         }
     }
