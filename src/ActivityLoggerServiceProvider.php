@@ -69,14 +69,15 @@ class ActivityLoggerServiceProvider extends ServiceProvider
     public static function logger(): Logger
     {
         // Get config
-        $name  = config('activitylogger.channel.name', 'user');
-        $path  = config('activitylogger.channel.path', storage_path('logs/activity.log'));
-        $days  = config('activitylogger.channel.days', 14);
-        $level = config('activitylogger.channel.level', 'debug');
+        $name       = config('activitylogger.channel.name', 'user');
+        $path       = config('activitylogger.channel.path', storage_path('logs/activity.log'));
+        $days       = config('activitylogger.channel.days', 14);
+        $level      = config('activitylogger.channel.level', 'debug');
+        $permission = config('activitylogger.channel.permission', 0644);
 
         // Make logger
         $log = new Logger($name);
-        $log->pushHandler(new RotatingFileHandler($path, $days, $level));
+        $log->pushHandler(new RotatingFileHandler($path, $days, $level, true, $permission));
 
         return $log;
     }
