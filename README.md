@@ -61,6 +61,23 @@ class User extends Model {
 ### Disable logs into database
 
 Add `ACTIVITY_LOGGER_TO_DATABASE=false` to your `.env` file will prevent logger from writing into database.
+
+### Change files permission
+
+If not already done, publish config file:
+```bash
+php artisan vendor:publish --provider="Webqamdev\ActivityLogger\ActivityLoggerServiceProvider" --tag="config"
+```
+
+Add `channel.permission` to your `config/activitylogger.php` file like this exemple:
+```php
+'channel' => [
+    'path'       => storage_path('logs/activity.log'),
+    'level'      => 'debug',
+    'days'       => 14,
+    'permission' => 0644, // Default value, equivalent to bash's rw-r--r--
+],
+```
     
 ## About
 
