@@ -12,17 +12,17 @@
         }
     ],
     "require": {
-        "spatie/laravel-activitylog": "^3.2"
+        "spatie/laravel-activitylog": "^4.5"
     },
     "autoload": {
         "psr-4": {
-            "webqamdev\\ActivityLogger\\": "src"
+            "Webqamdev\\ActivityLogger\\": "src"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "webqamdev\\ActivityLogger\\ActivityLoggerServiceProvider"
+                "Webqamdev\\ActivityLogger\\ActivityLoggerServiceProvider"
             ]
         }
     }
