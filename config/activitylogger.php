@@ -18,13 +18,19 @@ return [
     'to_database' => env('ACTIVITY_LOGGER_TO_DATABASE', true),
 
     /*
+    * configure the number of days before deleting the logs (default for DB => 90, default for files => 14).
+    */
+
+    'days_before_delete_log' => env('DAYS_BEFORE_DELETE_LOG', 90),
+
+    /*
      * Configure logging channel. Driver is forced to 'daily'.
      */
 
     'channel' => [
         'path'  => storage_path('logs/activity.log'),
         'level' => 'debug',
-        'days'  => 14,
+        'days'  => env('DAYS_BEFORE_DELETE_LOG', 90),
     ],
 
     /*

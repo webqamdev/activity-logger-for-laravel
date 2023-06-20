@@ -5,11 +5,16 @@ namespace Webqamdev\ActivityLogger\Listeners;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Spatie\Activitylog\Models\Activity;
 use Webqamdev\ActivityLogger\ActivityLoggerServiceProvider;
 
 class ActivityLogger
 {
+
+    const CACHE_DURATION_IN_DAYS  = 1;
+    const CACHE_KEY_PURGE = 'flag_delete_logs';
+
     /** @var Authenticatable|null */
     protected $user;
 
@@ -59,6 +64,17 @@ class ActivityLogger
 
         self::logDatabase($action, $model, $this->user, $dirty);
         self::logFile($action, $model, $this->user, $dirty);
+        ActivityLogger::purgeDatabase();
+    }
+
+    private static function purgeDatabase()
+    {
+        if (Cache::has(ActivityLogger::CACHE_KEY_PURGE) === false) {
+            Cache::put(ActivityLogger::CACHE_KEY_PURGE, time(), now()->addDays(ActivityLogger::CACHE_DURATION_IN_DAYS));
+            Activity::query()
+                ->where('created_at', '<=', now()->subDay(config('activitylogger.days_before_delete_log')))
+                ->delete();
+        }
     }
 
     public static function logDatabase(string $action, Model $on, Authenticatable $by = null, array $with = null)
