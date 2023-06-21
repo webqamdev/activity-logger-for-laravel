@@ -78,6 +78,10 @@ Add `channel.permission` to your `config/activitylogger.php` file like this exem
     'permission' => 0644, // Default value, equivalent to bash's rw-r--r--
 ],
 ```
+
+## Upgrading
+
+Please see [UPGRADING](UPGRADING.md) for details.
     
 ## About
 
