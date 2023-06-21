@@ -18,6 +18,12 @@ return [
     'to_database' => env('ACTIVITY_LOGGER_TO_DATABASE', true),
 
     /*
+     * Used of `log_name` in Activity.
+     */
+
+    'log_name' => 'activitylogger',
+
+    /*
     * configure the number of days before deleting the logs (default for DB => 90, default for files => 14).
     */
 

@@ -83,7 +83,7 @@ class ActivityLogger
             return;
         }
 
-        ActivityLoggerServiceProvider::activity('activitylogger')
+        ActivityLoggerServiceProvider::activity(config('activitylogger.log_name', 'activitylogger'))
             ->event($action)
             ->performedOn($on)
             ->causedBy($by)
