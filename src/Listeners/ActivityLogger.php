@@ -67,33 +67,21 @@ class ActivityLogger
 
     private function makePropertiesArray(string $action, Model $model, array $attributesToHide)
     {
-        if ($action === 'deleted') {
-            return [
-                'attributes' => [],
-                'old' => collect($model->getRawOriginal())
-                    ->except($attributesToHide)
-                    ->all(),
-            ];
-        }
-        if ($action === 'created') {
-            return [
-                'attributes' => collect($model->getAttributes())
-                    ->except($attributesToHide)
-                    ->all(),
-                'old' => [],
-            ];
-        }
-
-        $allowedDirtyValues = array_filter($model->getDirty(), function (string $key) use ($attributesToHide) {
-            return ! in_array($key, $attributesToHide);
-        }, ARRAY_FILTER_USE_KEY);
-
         return [
-            'attributes' => $allowedDirtyValues,
-            'old' => collect($model->getRawOriginal())
-                ->only(array_keys($allowedDirtyValues))
-                ->all(),
+            'attributes' => $action === 'deleted'
+                ? []
+                : $this->getFilteredAttributes($model->getAttributes(), $attributesToHide),
+            'old' => $action === 'created'
+                ? []
+                : $this->getFilteredAttributes($model->getRawOriginal(), $attributesToHide),
         ];
+    }
+
+    private function getFilteredAttributes(array $attributesValues, array $attributesToHide)
+    {
+        return collect($attributesValues)
+            ->except($attributesToHide)
+            ->all();
     }
 
     private static function purgeDatabase()
