@@ -55,7 +55,7 @@ class ActivityLogger
         }
 
         // Get only visible dirty values
-        $modelHidden  = optional($model)->activity_hidden ?? [];
+        $modelHidden  = optional($model)->logAttributesToIgnore ?? [];
         $configHidden = config('activitylogger.properties_hidden', ['password']);
         $hidden       = array_merge($modelHidden, $configHidden);
         $dirty        = array_filter($model->getDirty(), function (string $key) use ($hidden) {
