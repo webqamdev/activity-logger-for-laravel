@@ -50,7 +50,7 @@ class ActivityLogger
         $action      = substr($eventAction, strpos($eventAction, '.') + 1);
         /** @var Model $model */
         $model = array_pop($models);
-        if ($model instanceof Activity) {
+        if ($model instanceof Activity || !$model instanceof Model) {
             return;
         }
 
@@ -58,13 +58,42 @@ class ActivityLogger
         $modelHidden  = optional($model)->logAttributesToIgnore ?? [];
         $configHidden = config('activitylogger.properties_hidden', ['password']);
         $hidden       = array_merge($modelHidden, $configHidden);
-        $dirty        = array_filter($model->getDirty(), function (string $key) use ($hidden) {
-            return ! in_array($key, $hidden);
+        $changes      = $this->makePropertiesArray($action, $model, $hidden);
+
+        self::logDatabase($action, $model, $this->user, $changes);
+        self::logFile($action, $model, $this->user, $changes);
+        ActivityLogger::purgeDatabase();
+    }
+
+    private function makePropertiesArray(string $action, Model $model, array $attributesToHide)
+    {
+        if ($action === 'deleted') {
+            return [
+                'attributes' => [],
+                'old' => collect($model->getRawOriginal())
+                    ->except($attributesToHide)
+                    ->all(),
+            ];
+        }
+        if ($action === 'created') {
+            return [
+                'attributes' => collect($model->getAttributes())
+                    ->except($attributesToHide)
+                    ->all(),
+                'old' => [],
+            ];
+        }
+
+        $allowedDirtyValues = array_filter($model->getDirty(), function (string $key) use ($attributesToHide) {
+            return ! in_array($key, $attributesToHide);
         }, ARRAY_FILTER_USE_KEY);
 
-        self::logDatabase($action, $model, $this->user, $dirty);
-        self::logFile($action, $model, $this->user, $dirty);
-        ActivityLogger::purgeDatabase();
+        return [
+            'attributes' => $allowedDirtyValues,
+            'old' => collect($model->getRawOriginal())
+                ->only(array_keys($allowedDirtyValues))
+                ->all(),
+        ];
     }
 
     private static function purgeDatabase()
