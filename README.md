@@ -49,7 +49,7 @@ class User extends Model {
      * 
      * @var array 
      */
-    public $activity_hidden = [
+    public $logAttributesToIgnore = [
         'password',
         'phone',
     ];
