@@ -35,7 +35,7 @@ return [
 
     /*
      * Remove properties from logging.
-     * Merged with Model->activity_hidden.
+     * Merged with Model->logAttributesToIgnore.
      */
 
     'properties_hidden' => [
