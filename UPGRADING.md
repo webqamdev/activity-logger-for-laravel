@@ -20,15 +20,15 @@ composer require webqamdev/activity-logger "^3.0.0"
 to
 ```json
 {
-  "old": {
-    "unchanged_attribute_1": "same-value",
-    "changed_attribute_1": "old-value",
-    "changed_attribute_2": "old-value"
-  },
   "attributes": {
     "unchanged_attribute_1": "same-value",
     "changed_attribute_1": "new-value",
     "changed_attribute_2": "new-value"
+  },
+  "old": {
+    "unchanged_attribute_1": "same-value",
+    "changed_attribute_1": "old-value",
+    "changed_attribute_2": "old-value"
   }
 }
 ```
