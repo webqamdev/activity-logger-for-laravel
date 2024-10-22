@@ -16,9 +16,10 @@ trait LogsActivity
 
     public function getActivitylogOptions(): LogOptions
     {
+        $except = $this->logAttributesToIgnore ?? config('activitylogger.properties_hidden', []);
         return LogOptions::defaults()
             ->logAll()
-            ->logExcept(['password']);
+            ->logExcept($except);
     }
 
     public static function cloneToActivityLogger(Model $source): static
