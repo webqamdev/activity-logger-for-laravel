@@ -25,6 +25,12 @@ class ActivityLogger extends \Spatie\Activitylog\ActivityLogger
 
     public function logDatabase(string $description): ?ActivityContract
     {
+        if (empty(config('activitylogger.to_database', true))) {
+            $this->disableLogging();
+            $this->activity = null;
+            return null;
+        }
+
         return parent::log($description);
     }
 
