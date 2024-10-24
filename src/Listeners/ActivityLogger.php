@@ -47,12 +47,12 @@ class ActivityLogger extends \Spatie\Activitylog\ActivityLogger
             ->info($description, $this->getActivity()->properties->toArray());
     }
 
-    public function purgeDatabase()
+    public function purgeDatabase(): void
     {
         if (Cache::has(ActivityLogger::CACHE_KEY_PURGE) === false) {
-            Cache::put(ActivityLogger::CACHE_KEY_PURGE, time(), now()->addDays(ActivityLogger::CACHE_DURATION_IN_DAYS));
+            Cache::put(ActivityLogger::CACHE_KEY_PURGE, time(), now()->addDays(self::CACHE_DURATION_IN_DAYS));
             Activity::query()
-                ->where('created_at', '<=', now()->subDay(config('activitylogger.days_before_delete_log')))
+                ->where('created_at', '<=', now()->subDays(config('activitylogger.days_before_delete_log', 1)))
                 ->delete();
         }
     }
