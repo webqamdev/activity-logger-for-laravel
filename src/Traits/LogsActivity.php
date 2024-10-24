@@ -54,18 +54,11 @@ trait LogsActivity
                 $result->{$property->getName()} = $property->getValue($source);
             }
         }
-
-
+        if (empty($result->table)) {
+            $result->table = $source->getTable();
+        }
 
         return $result;
-    }
-
-    /**
-     * Get the table associated with the model.
-     */
-    public function getTable(): string
-    {
-        return parent::getTable();
     }
 
     public function __call($method, $parameters)
