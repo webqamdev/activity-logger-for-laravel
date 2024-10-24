@@ -50,7 +50,7 @@ class ActivityLoggerServiceProvider extends ServiceProvider
             }
         });
 
-        $this->app->bind(ActivityLogger::class, \Webqamdev\ActivityLogger\Listeners\ActivityLogger::class);
+        $this->app->bind(ActivityLogger::class, Listeners\ActivityLogger::class);
     }
 
     /**
@@ -96,7 +96,15 @@ class ActivityLoggerServiceProvider extends ServiceProvider
 
         foreach ($events as $event) {
             $logMethod = 'logActivity' . ucfirst($event) . 'Event';
-            $modelClass::{$event}(fn (Model $model) => $logClass::cloneToActivityLogger($model)->{$logMethod}());
+            $isCloneClearRequired = str_ends_with($event, 'ed');
+            $modelClass::{$event}(function (Model $model) use ($logClass, $logMethod, $isCloneClearRequired) {
+                $response = $logClass::cloneToActivityLogger($model)->{$logMethod}();
+                if ($isCloneClearRequired) {
+                    $logClass::clearActivityLoggerClone($model);
+                }
+
+                return $response;
+            });
         }
     }
 

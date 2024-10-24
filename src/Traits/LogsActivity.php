@@ -61,6 +61,17 @@ trait LogsActivity
         return $result;
     }
 
+    public static function clearActivityLoggerClone(Model $source): void
+    {
+        if (!isset(static::$activityLoggerClones)) {
+            return;
+        }
+
+        static::$activityLoggerClones = static::$activityLoggerClones->reject(function ($item) use ($source) {
+            return $item['source'] === $source;
+        });
+    }
+
     public function __call($method, $parameters)
     {
         if (Str::startsWith($method, 'logActivity') && Str::endsWith($method, 'Event')) {
