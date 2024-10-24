@@ -14,7 +14,6 @@ class ActivityLogger extends \Spatie\Activitylog\ActivityLogger
 
     public function log(string $description): ?ActivityContract
     {
-        $this->getActivity()->log_name = config('activitylogger.log_name', 'activitylogger');
         $this->logFile($description);
         $model = $this->logDatabase($description);
         if (!empty($model)) {

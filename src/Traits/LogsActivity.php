@@ -18,6 +18,7 @@ trait LogsActivity
     {
         $except = $this->logAttributesToIgnore ?? config('activitylogger.properties_hidden', []);
         return LogOptions::defaults()
+            ->useLogName(config('activitylogger.log_name', 'activitylogger'))
             ->logAll()
             ->logExcept($except);
     }
