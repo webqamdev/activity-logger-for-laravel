@@ -31,13 +31,13 @@ class ActivityLogger extends \Spatie\Activitylog\ActivityLogger
     public function logFile(string $action): void
     {
         $activity    = $this->getActivity();
-        $by          = optional($activity->causer);
+        $causer      = $activity->causer;
+        $by          = empty($causer) ? 'System' : sprintf('%s(%d)', $causer->email, $causer->id);
         $onId        = $activity->subject_id;
         $onClass     = $activity->subject_type;
         $description = sprintf(
-            '%s(%d) has %s Model %s#%d',
-            $by->email,
-            $by->id,
+            '%s has %s Model %s#%d',
+            $by,
             $action,
             $onClass,
             $onId
