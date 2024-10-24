@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Logger;
-use Spatie\Activitylog\ActivityLogger;
 use Spatie\Activitylog\ActivityLogger as SpatieActivityLogger;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity as SpatieLogsActivity;
@@ -50,7 +49,7 @@ class ActivityLoggerServiceProvider extends ServiceProvider
             }
         });
 
-        $this->app->bind(ActivityLogger::class, Listeners\ActivityLogger::class);
+        $this->app->bind(SpatieActivityLogger::class, Listeners\ActivityLogger::class);
     }
 
     /**
