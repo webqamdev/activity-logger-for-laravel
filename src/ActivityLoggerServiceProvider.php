@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Event;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Logger;
 use Spatie\Activitylog\ActivityLogger as SpatieActivityLogger;
-use Webqamdev\ActivityLogger\Listeners\ActivityLogger;
+use Webqamdev\ActivityLogger\Listeners\ActivityLoggerSubscriber;
 
 class ActivityLoggerServiceProvider extends ServiceProvider
 {
@@ -37,7 +37,7 @@ class ActivityLoggerServiceProvider extends ServiceProvider
     {
         parent::boot();
 
-        Event::listen(['eloquent.created: *', 'eloquent.updated: *', 'eloquent.deleted: *'], ActivityLogger::class);
+        Event::subscribe(ActivityLoggerSubscriber::class);
     }
 
     /**
