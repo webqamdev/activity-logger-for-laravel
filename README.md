@@ -18,10 +18,10 @@ composer require webqamdev/activity-logger
 The package will automatically register itself.
 
 Configure [spatie/laravel-activitylog](https://github.com/spatie/laravel-activitylog/blob/master/README.md#installation).
-By default, run thoses commands :
+By default, run those commands :
 
 ```bash
-php artisan vendor:publish --provider="Spatie\Activitylog\ActivitylogServiceProvider" --tag="migrations"
+php artisan vendor:publish --provider="Spatie\Activitylog\ActivitylogServiceProvider" --tag="activitylog-migrations"
 php artisan migrate
 ```
 
@@ -36,7 +36,7 @@ php artisan vendor:publish --provider="Webqamdev\ActivityLogger\ActivityLoggerSe
 ### Globally hide a property
 
 Publish config file. Then add entries to `properties_hidden` array.
-    
+
 ### Hide a Model property
 
 Create your model normally, then define hidden properties.
@@ -65,11 +65,13 @@ Add `ACTIVITY_LOGGER_TO_DATABASE=false` to your `.env` file will prevent logger 
 ### Change files permission
 
 If not already done, publish config file:
+
 ```bash
 php artisan vendor:publish --provider="Webqamdev\ActivityLogger\ActivityLoggerServiceProvider" --tag="config"
 ```
 
 Add `channel.permission` to your `config/activitylogger.php` file like this exemple:
+
 ```php
 'channel' => [
     'path'       => storage_path('logs/activity.log'),
@@ -82,10 +84,11 @@ Add `channel.permission` to your `config/activitylogger.php` file like this exem
 ## Upgrading
 
 Please see [UPGRADING](UPGRADING.md) for details.
-    
+
 ## About
 
 This package using Laravel 5.8 is a plugin for auto-logging activities.
 
-Gitlab repository : [Activity logger for Laravel](https://gitlab.webqam.fr/webqam/laravel-modules/activity-logger-for-laravel)
+Gitlab
+repository : [Activity logger for Laravel](https://gitlab.webqam.fr/webqam/laravel-modules/activity-logger-for-laravel)
 Github repository : [Activity logger for Laravel](https://github.com/webqamdev/activity-logger-for-laravel)
