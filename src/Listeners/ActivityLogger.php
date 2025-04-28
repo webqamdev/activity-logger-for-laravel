@@ -71,9 +71,13 @@ class ActivityLogger
     {
         if (Cache::has(ActivityLogger::CACHE_KEY_PURGE) === false) {
             Cache::put(ActivityLogger::CACHE_KEY_PURGE, time(), now()->addDays(ActivityLogger::CACHE_DURATION_IN_DAYS));
-            Activity::query()
-                ->where('created_at', '<=', now()->subDay(config('activitylogger.days_before_delete_log')))
-                ->delete();
+
+            if (config('activitylogger.to_database', true)) {
+                Activity::query()
+                    ->where('created_at', '<=', now()->subDay(config('activitylogger.days_before_delete_log')))
+                    ->delete();
+            }
+
         }
     }
 
