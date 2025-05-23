@@ -12,6 +12,7 @@
         }
     ],
     "require": {
+        "php": "^8.3",
         "spatie/laravel-activitylog": "^4.5"
     },
     "autoload": {
