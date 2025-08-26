@@ -12,14 +12,15 @@ use Webqamdev\ActivityLogger\ActivityLoggerServiceProvider;
 class ActivityLogger
 {
     const int CACHE_DURATION_IN_DAYS = 1;
+
     const string CACHE_KEY_PURGE = 'flag_delete_logs';
 
     protected ?Authenticatable $user;
+
     protected bool $toDatabase;
 
     /**
      * Create the event listener.
-     *
      */
     public function __construct(?Authenticatable $user = null)
     {
@@ -28,7 +29,7 @@ class ActivityLogger
 
     public function handle(string $event, array $models): void
     {
-        if (false === config('activitylogger.enabled', true)) {
+        if (config('activitylogger.enabled', true) === false) {
             return;
         }
 
@@ -45,7 +46,7 @@ class ActivityLogger
         $modelHidden = optional($model)->logAttributesToIgnore ?? [];
         $configHidden = config('activitylogger.properties_hidden', ['password']);
         $hidden = array_merge($modelHidden, $configHidden);
-        $dirty = array_filter($model->getDirty(), fn(string $key) => !in_array($key, $hidden), ARRAY_FILTER_USE_KEY);
+        $dirty = array_filter($model->getDirty(), fn (string $key) => ! in_array($key, $hidden), ARRAY_FILTER_USE_KEY);
 
         self::logDatabase($action, $model, $this->user, $dirty);
         self::logFile($action, $model, $this->user, $dirty);
@@ -55,7 +56,7 @@ class ActivityLogger
 
     private static function purgeDatabase(): void
     {
-        if (!Cache::has(ActivityLogger::CACHE_KEY_PURGE)) {
+        if (! Cache::has(ActivityLogger::CACHE_KEY_PURGE)) {
             return;
         }
 
@@ -70,7 +71,7 @@ class ActivityLogger
 
     public static function logDatabase(string $action, Model $on, ?Authenticatable $by = null, ?array $with = null)
     {
-        if (config('activitylogger.to_database', true) === false || !$by instanceof Model) {
+        if (config('activitylogger.to_database', true) === false || ! $by instanceof Model) {
             return;
         }
 

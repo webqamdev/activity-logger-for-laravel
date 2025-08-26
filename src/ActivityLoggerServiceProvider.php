@@ -20,10 +20,10 @@ class ActivityLoggerServiceProvider extends ServiceProvider
     public function register()
     {
         $this->publishes([
-            __DIR__ . '/../config/activitylogger.php' => config_path('activitylogger.php'),
+            __DIR__.'/../config/activitylogger.php' => config_path('activitylogger.php'),
         ], 'config');
 
-        $this->mergeConfigFrom(__DIR__ . '/../config/activitylogger.php', 'activitylogger');
+        $this->mergeConfigFrom(__DIR__.'/../config/activitylogger.php', 'activitylogger');
 
         $this->app->bind(Authenticatable::class, config('activitylogger.user_model'));
     }
@@ -42,12 +42,8 @@ class ActivityLoggerServiceProvider extends ServiceProvider
 
     /**
      * Return activity() helper's result with package config.
-     *
-     * @param string|null $logName
-     *
-     * @return SpatieActivityLogger
      */
-    public static function activity(string $logName = null): SpatieActivityLogger
+    public static function activity(?string $logName = null): SpatieActivityLogger
     {
         $activity = activity($logName);
         $config = config('activitylogger.enabled', true);
@@ -63,8 +59,6 @@ class ActivityLoggerServiceProvider extends ServiceProvider
 
     /**
      * Return Logger to use. Replace Log Facade.
-     *
-     * @return Logger
      */
     public static function logger(): Logger
     {
