@@ -23,7 +23,7 @@ class ActivityLoggerServiceProvider extends ServiceProvider
             __DIR__ . '/../config/activitylogger.php' => config_path('activitylogger.php'),
         ], 'config');
 
-        $this->mergeConfigFrom(__DIR__.'/../config/activitylogger.php', 'activitylogger');
+        $this->mergeConfigFrom(__DIR__ . '/../config/activitylogger.php', 'activitylogger');
 
         $this->app->bind(Authenticatable::class, config('activitylogger.user_model'));
     }
@@ -50,7 +50,7 @@ class ActivityLoggerServiceProvider extends ServiceProvider
     public static function activity(string $logName = null): SpatieActivityLogger
     {
         $activity = activity($logName);
-        $config   = config('activitylogger.enabled', true);
+        $config = config('activitylogger.enabled', true);
 
         if ($config === true) {
             $activity->enableLogging();
@@ -68,11 +68,10 @@ class ActivityLoggerServiceProvider extends ServiceProvider
      */
     public static function logger(): Logger
     {
-        // Get config
-        $name       = config('activitylogger.channel.name', 'user');
-        $path       = config('activitylogger.channel.path', storage_path('logs/activity.log'));
-        $days       = config('activitylogger.channel.days', 14);
-        $level      = config('activitylogger.channel.level', 'debug');
+        $name = config('activitylogger.channel.name', 'user');
+        $path = config('activitylogger.channel.path', storage_path('logs/activity.log'));
+        $days = config('activitylogger.channel.days', 14);
+        $level = config('activitylogger.channel.level', 'debug');
         $permission = config('activitylogger.channel.permission', 0644);
 
         // Make logger

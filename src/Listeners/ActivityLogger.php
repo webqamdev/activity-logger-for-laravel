@@ -11,43 +11,30 @@ use Webqamdev\ActivityLogger\ActivityLoggerServiceProvider;
 
 class ActivityLogger
 {
+    const int CACHE_DURATION_IN_DAYS = 1;
+    const string CACHE_KEY_PURGE = 'flag_delete_logs';
 
-    const CACHE_DURATION_IN_DAYS  = 1;
-    const CACHE_KEY_PURGE = 'flag_delete_logs';
-
-    /** @var Authenticatable|null */
-    protected $user;
+    protected ?Authenticatable $user;
+    protected bool $toDatabase;
 
     /**
      * Create the event listener.
      *
-     * @param Authenticatable|null $user
      */
-    public function __construct(Authenticatable $user = null)
+    public function __construct(?Authenticatable $user = null)
     {
-        if (! empty($user->id)) {
-            $this->user = $user;
-        } else {
-            $this->user = self::getCurrentUser();
-        }
+        $this->user = $user ?? self::getCurrentUser();
     }
 
-    /**
-     * Handle the event.
-     *
-     * @param string $event
-     * @param array  $models
-     *
-     * @return void
-     */
-    public function handle(string $event, array $models)
+    public function handle(string $event, array $models): void
     {
-        if (config('activitylogger.enabled', true) === false) {
+        if (false === config('activitylogger.enabled', true)) {
             return;
         }
 
         $eventAction = substr($event, 0, strpos($event, ':'));
-        $action      = substr($eventAction, strpos($eventAction, '.') + 1);
+        $action = substr($eventAction, strpos($eventAction, '.') + 1);
+
         /** @var Model $model */
         $model = array_pop($models);
         if ($model instanceof Activity) {
@@ -55,29 +42,33 @@ class ActivityLogger
         }
 
         // Get only visible dirty values
-        $modelHidden  = optional($model)->logAttributesToIgnore ?? [];
+        $modelHidden = optional($model)->logAttributesToIgnore ?? [];
         $configHidden = config('activitylogger.properties_hidden', ['password']);
-        $hidden       = array_merge($modelHidden, $configHidden);
-        $dirty        = array_filter($model->getDirty(), function (string $key) use ($hidden) {
-            return ! in_array($key, $hidden);
-        }, ARRAY_FILTER_USE_KEY);
+        $hidden = array_merge($modelHidden, $configHidden);
+        $dirty = array_filter($model->getDirty(), fn(string $key) => !in_array($key, $hidden), ARRAY_FILTER_USE_KEY);
 
         self::logDatabase($action, $model, $this->user, $dirty);
         self::logFile($action, $model, $this->user, $dirty);
+
         ActivityLogger::purgeDatabase();
     }
 
-    private static function purgeDatabase()
+    private static function purgeDatabase(): void
     {
-        if (Cache::has(ActivityLogger::CACHE_KEY_PURGE) === false) {
-            Cache::put(ActivityLogger::CACHE_KEY_PURGE, time(), now()->addDays(ActivityLogger::CACHE_DURATION_IN_DAYS));
+        if (!Cache::has(ActivityLogger::CACHE_KEY_PURGE)) {
+            return;
+        }
+
+        Cache::put(ActivityLogger::CACHE_KEY_PURGE, time(), now()->addDays(ActivityLogger::CACHE_DURATION_IN_DAYS));
+
+        if (config('activitylogger.to_database', true)) {
             Activity::query()
                 ->where('created_at', '<=', now()->subDay(config('activitylogger.days_before_delete_log')))
                 ->delete();
         }
     }
 
-    public static function logDatabase(string $action, Model $on, Authenticatable $by = null, array $with = null)
+    public static function logDatabase(string $action, Model $on, ?Authenticatable $by = null, ?array $with = null)
     {
         if (config('activitylogger.to_database', true) === false || !$by instanceof Model) {
             return;
@@ -90,10 +81,10 @@ class ActivityLogger
             ->log(":causer.email(:causer.id) has $action Model");
     }
 
-    public static function logFile(string $action, Model $on, Authenticatable $by = null, array $with = null)
+    public static function logFile(string $action, Model $on, ?Authenticatable $by = null, ?array $with = null)
     {
-        $by          = optional($by);
-        $onClass     = get_class($on);
+        $by = optional($by);
+        $onClass = get_class($on);
         $description = "{$by->email}({$by->id}) has $action Model {$onClass}#{$on->id}";
 
         ActivityLoggerServiceProvider::logger()
