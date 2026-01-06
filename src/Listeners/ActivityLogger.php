@@ -157,15 +157,23 @@ class ActivityLogger
 
     protected static function purgeDatabase(): void
     {
-        if (! Cache::has(ActivityLogger::CACHE_KEY_PURGE)) {
+        if (Cache::has(ActivityLogger::CACHE_KEY_PURGE)) {
             return;
         }
 
-        Cache::put(ActivityLogger::CACHE_KEY_PURGE, time(), now()->addDays(ActivityLogger::CACHE_DURATION_IN_DAYS));
+        Cache::put(
+            key: ActivityLogger::CACHE_KEY_PURGE,
+            value: time(),
+            ttl: now()->addDays(ActivityLogger::CACHE_DURATION_IN_DAYS),
+        );
 
         if (config('activitylogger.to_database', true)) {
             Activity::query()
-                ->where('created_at', '<=', now()->subDay(config('activitylogger.days_before_delete_log')))
+                ->where(
+                    Activity::CREATED_AT,
+                    '<=',
+                    now()->subDay(config('activitylogger.days_before_delete_log')),
+                )
                 ->delete();
         }
     }
