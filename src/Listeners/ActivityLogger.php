@@ -4,9 +4,11 @@ namespace Webqamdev\ActivityLogger\Listeners;
 
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Spatie\Activitylog\EventLogBag;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Webqamdev\ActivityLogger\ActivityLogger as Logger;
@@ -73,7 +75,7 @@ class ActivityLogger
             return;
         }
 
-        $description = sprintf("%s#%d has been %s", $model::class, $model->id, $action);
+        $description = sprintf('%s#%d has been %s', $model::class, $model->id, $action);
 
         if ($this->user instanceof Authenticatable && $this->user->id) {
             $description = sprintf(
@@ -105,7 +107,7 @@ class ActivityLogger
         );
         $dirty = array_filter(
             $model->getDirty(),
-            fn(string $key): bool => !in_array($key, $hidden),
+            fn (string $key): bool => ! in_array($key, $hidden),
             ARRAY_FILTER_USE_KEY,
         );
 
@@ -124,13 +126,24 @@ class ActivityLogger
             $logName = $model->getLogNameToUse();
 
             // Submitting empty description will cause place holder replacer to fail.
-            if ($model->getDescriptionForEvent($action) == '') {
+            if ($model->getDescriptionForEvent($action) === '') {
                 return null;
             }
 
-            if ($model->isLogEmpty($changes) && !$activitylogOptions->submitEmptyLogs) {
+            if ($model->isLogEmpty($changes) && ! $activitylogOptions->submitEmptyLogs) {
                 return null;
             }
+
+            // User can define a custom pipelines to mutate, add or remove from changes
+            // each pipe receives the event carrier bag with changes and the model in
+            // question every pipe should manipulate new and old attributes.
+            $event = app(Pipeline::class)
+                ->send(new EventLogBag($action, $model, $changes, $model->activitylogOptions))
+                ->through($model::$changesPipes)
+                ->thenReturn();
+
+            /** @var EventLogBag $event */
+            $dirty = $event->changes;
         }
 
         $activityLogger->withProperties($dirty);
