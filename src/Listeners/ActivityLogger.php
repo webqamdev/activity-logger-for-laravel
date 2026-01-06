@@ -98,7 +98,7 @@ class ActivityLogger
     /**
      * @param  Model|LogsActivity|null  $model
      */
-    protected function getActivityLogger(?Model $model, string $action): ?Logger
+    protected function getActivityLogger(?Model $model, string $eventName): ?Logger
     {
         // Get only visible dirty values
         $hidden = array_merge(
@@ -116,20 +116,16 @@ class ActivityLogger
             ->causedBy($this->user);
 
         if (method_exists($model, 'getActivitylogOptions')) {
-            $activitylogOptions = $model->getActivitylogOptions();
+            $model->activitylogOptions = $model->getActivitylogOptions();
 
-            if (empty(Arr::except($dirty, $activitylogOptions->dontLogIfAttributesChangedOnly))) {
+            $changes = $model->attributeValuesToBeLogged($eventName);
+
+            // Submitting empty description will cause placeholder replacer to fail.
+            if ($model->getDescriptionForEvent($eventName) === '') {
                 return null;
             }
 
-            $changes = $model->attributeValuesToBeLogged($action);
-
-            // Submitting empty description will cause place holder replacer to fail.
-            if ($model->getDescriptionForEvent($action) === '') {
-                return null;
-            }
-
-            if ($model->isLogEmpty($changes) && ! $activitylogOptions->submitEmptyLogs) {
+            if ($model->isLogEmpty($changes) && ! $model->activitylogOptions->submitEmptyLogs) {
                 return null;
             }
 
@@ -137,18 +133,21 @@ class ActivityLogger
             // each pipe receives the event carrier bag with changes and the model in
             // question every pipe should manipulate new and old attributes.
             $event = app(Pipeline::class)
-                ->send(new EventLogBag($action, $model, $changes, $model->activitylogOptions))
+                ->send(new EventLogBag($eventName, $model, $changes, $model->activitylogOptions))
                 ->through($model::$changesPipes)
                 ->thenReturn();
 
             /** @var EventLogBag $event */
             $dirty = $event->changes;
+
+            // Reset log options so the model can be serialized.
+            $model->activitylogOptions = null;
         }
 
         $activityLogger->withProperties($dirty);
 
         if (method_exists($model, 'tapActivity')) {
-            $activityLogger->tap([$model, 'tapActivity'], $action);
+            $activityLogger->tap([$model, 'tapActivity'], $eventName);
         }
 
         return $activityLogger;
