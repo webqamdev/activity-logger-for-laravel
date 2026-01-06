@@ -75,7 +75,7 @@ class ActivityLogger
             return;
         }
 
-        $description = sprintf('%s#%d has been %s', $model::class, $model->id, $action);
+        $description = sprintf('%s#%s has been %s', $model::class, $model->getKey(), $action);
 
         if ($this->user instanceof Authenticatable && $this->user->id) {
             $description = sprintf(
@@ -123,7 +123,6 @@ class ActivityLogger
             }
 
             $changes = $model->attributeValuesToBeLogged($action);
-            $logName = $model->getLogNameToUse();
 
             // Submitting empty description will cause place holder replacer to fail.
             if ($model->getDescriptionForEvent($action) === '') {
