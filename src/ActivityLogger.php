@@ -2,8 +2,8 @@
 
 namespace Webqamdev\ActivityLogger;
 
-use Monolog\Handler\RotatingFileHandler;
-use Monolog\Logger;
+use Illuminate\Support\Facades\Log;
+use Psr\Log\LoggerInterface;
 use Spatie\Activitylog\ActivityLogger as SpatieActivityLogger;
 
 class ActivityLogger extends SpatieActivityLogger
@@ -30,18 +30,14 @@ class ActivityLogger extends SpatieActivityLogger
         $this->activity = null;
     }
 
-    protected function getLogger(): Logger
+    protected function getLogger(): LoggerInterface
     {
-        $name = config('activitylogger.channel.name', 'user');
-        $path = config('activitylogger.channel.path', storage_path('logs/activity.log'));
-        $days = config('activitylogger.channel.days', 14);
-        $level = config('activitylogger.channel.level', 'debug');
-        $permission = config('activitylogger.channel.permission', 0644);
-
-        // Make logger
-        $log = new Logger($name);
-        $log->pushHandler(new RotatingFileHandler($path, $days, $level, true, $permission));
-
-        return $log;
+        return Log::build([
+            'driver' => 'daily',
+            'path' => config('activitylogger.channel.path', storage_path('logs/activity.log')),
+            'days' => config('activitylogger.channel.days', 14),
+            'level' => config('activitylogger.channel.level', 'debug'),
+            'permission' => config('activitylogger.channel.permission', 0644),
+        ]);
     }
 }
