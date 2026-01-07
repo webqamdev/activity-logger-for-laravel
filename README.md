@@ -33,6 +33,50 @@ php artisan vendor:publish --provider="Webqamdev\ActivityLogger\ActivityLoggerSe
 
 ## Usage
 
+### Model Configuration & Detailed Logs
+
+To enable detailed logging and ensure the logs follow the standard Spatie format (recording changes with `old` and
+`attributes` values), your model must use the `Spatie\Activitylog\Traits\LogsActivity` trait and implement the
+`getActivitylogOptions` method.
+
+This is **necessary** to achieve the following structure in your logs (showing what changed):
+
+```php
+[
+   'old' => [
+        'name' => 'original name',
+        'text' => 'Lorum',
+    ],
+    'attributes' => [
+        'name' => 'updated name',
+        'text' => 'Lorum',
+    ],
+]
+```
+
+Example:
+
+```php
+use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
+
+class User extends Model
+{
+    use LogsActivity;
+
+    /**
+     * Configure the activity logging rules.
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logAll()       // Log all attributes...
+            ->logOnlyDirty(); // ...but only store changes
+    }
+}
+```
+
 ### Globally hide a property
 
 Publish config file. Then add entries to `properties_hidden` array.

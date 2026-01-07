@@ -5,19 +5,14 @@ namespace Webqamdev\ActivityLogger;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
-use Monolog\Handler\RotatingFileHandler;
-use Monolog\Logger;
-use Spatie\Activitylog\ActivityLogger as SpatieActivityLogger;
-use Webqamdev\ActivityLogger\Listeners\ActivityLogger;
+use Webqamdev\ActivityLogger\Listeners\ActivityLogger as ActivityLoggerListener;
 
 class ActivityLoggerServiceProvider extends ServiceProvider
 {
     /**
-     * Register services.
-     *
-     * @return void
+     * {@inheritDoc}
      */
-    public function register()
+    public function register(): void
     {
         $this->publishes([
             __DIR__.'/../config/activitylogger.php' => config_path('activitylogger.php'),
@@ -29,23 +24,24 @@ class ActivityLoggerServiceProvider extends ServiceProvider
     }
 
     /**
-     * Bootstrap services.
-     *
-     * @return void
+     * {@inheritDoc}
      */
-    public function boot()
+    public function boot(): void
     {
         parent::boot();
 
-        Event::listen(['eloquent.created: *', 'eloquent.updated: *', 'eloquent.deleted: *'], ActivityLogger::class);
+        Event::listen(
+            ['eloquent.created: *', 'eloquent.updated: *', 'eloquent.deleted: *', 'eloquent.restored: *'],
+            ActivityLoggerListener::class,
+        );
     }
 
     /**
      * Return activity() helper's result with package config.
      */
-    public static function activity(?string $logName = null): SpatieActivityLogger
+    public static function activity(): ActivityLogger
     {
-        $activity = activity($logName);
+        $activity = app()->make(ActivityLogger::class);
         $config = config('activitylogger.enabled', true);
 
         if ($config === true) {
@@ -55,23 +51,5 @@ class ActivityLoggerServiceProvider extends ServiceProvider
         } // Else use default config
 
         return $activity;
-    }
-
-    /**
-     * Return Logger to use. Replace Log Facade.
-     */
-    public static function logger(): Logger
-    {
-        $name = config('activitylogger.channel.name', 'user');
-        $path = config('activitylogger.channel.path', storage_path('logs/activity.log'));
-        $days = config('activitylogger.channel.days', 14);
-        $level = config('activitylogger.channel.level', 'debug');
-        $permission = config('activitylogger.channel.permission', 0644);
-
-        // Make logger
-        $log = new Logger($name);
-        $log->pushHandler(new RotatingFileHandler($path, $days, $level, true, $permission));
-
-        return $log;
     }
 }
