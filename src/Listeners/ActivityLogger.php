@@ -141,7 +141,7 @@ class ActivityLogger
             $dirty = $event->changes;
 
             // Reset log options so the model can be serialized.
-            $model->activitylogOptions = null;
+            unset($model->activitylogOptions);
         }
 
         $activityLogger->withProperties($dirty);
