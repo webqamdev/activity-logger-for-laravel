@@ -5,7 +5,6 @@ namespace Webqamdev\ActivityLogger\Listeners;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pipeline\Pipeline;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Spatie\Activitylog\EventLogBag;
@@ -86,11 +85,7 @@ class ActivityLogger
             );
         }
 
-        if (config('activitylogger.to_database', true) === true) {
-            $activityLogger->log($description);
-        }
-
-        $activityLogger->logFile($description);
+        $activityLogger->log($description);
 
         ActivityLogger::purgeDatabase();
     }
@@ -100,17 +95,6 @@ class ActivityLogger
      */
     protected function getActivityLogger(?Model $model, string $eventName): ?Logger
     {
-        // Get only visible dirty values
-        $hidden = array_merge(
-            $model?->logAttributesToIgnore ?? [],
-            config('activitylogger.properties_hidden', ['password']),
-        );
-        $dirty = array_filter(
-            $model->getDirty(),
-            fn (string $key): bool => ! in_array($key, $hidden),
-            ARRAY_FILTER_USE_KEY,
-        );
-
         $activityLogger = ActivityLoggerServiceProvider::activity()
             ->performedOn($model)
             ->causedBy($this->user);
@@ -142,6 +126,17 @@ class ActivityLogger
 
             // Reset log options so the model can be serialized.
             unset($model->activitylogOptions);
+        } else {
+            // Get only visible dirty values
+            $hidden = array_merge(
+                $model?->logAttributesToIgnore ?? [],
+                config('activitylogger.properties_hidden', ['password']),
+            );
+            $dirty = array_filter(
+                $model->getDirty(),
+                fn (string $key): bool => ! in_array($key, $hidden),
+                ARRAY_FILTER_USE_KEY,
+            );
         }
 
         $activityLogger->withProperties($dirty);

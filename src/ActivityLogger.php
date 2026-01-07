@@ -5,18 +5,19 @@ namespace Webqamdev\ActivityLogger;
 use Illuminate\Support\Facades\Log;
 use Psr\Log\LoggerInterface;
 use Spatie\Activitylog\ActivityLogger as SpatieActivityLogger;
+use Spatie\Activitylog\Contracts\Activity as ActivityContract;
 
 class ActivityLogger extends SpatieActivityLogger
 {
-    public function logFile(string $description): void
+    public function log(string $description): ?ActivityContract
     {
         if ($this->logStatus->disabled()) {
-            return;
+            return null;
         }
 
         $activity = $this->activity;
 
-        $description = $this->replacePlaceholders(
+        $activity->description = $this->replacePlaceholders(
             $activity->description ?? $description,
             $activity,
         );
@@ -27,7 +28,13 @@ class ActivityLogger extends SpatieActivityLogger
 
         $this->getLogger()->info($description, $activity->properties->toArray());
 
+        if (config('activitylogger.to_database', true) === true) {
+            $activity->save();
+        }
+
         $this->activity = null;
+
+        return $activity;
     }
 
     protected function getLogger(): LoggerInterface
