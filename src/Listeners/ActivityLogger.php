@@ -8,6 +8,7 @@ use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Spatie\Activitylog\EventLogBag;
+use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Webqamdev\ActivityLogger\ActivityLogger as Logger;
@@ -76,6 +77,19 @@ class ActivityLogger
 
         $description = sprintf('%s#%s has been %s', $model::class, $model->getKey(), $action);
 
+        if (method_exists($model, 'getActivitylogOptions')) {
+            /** @var LogOptions $logOptions */
+            $logOptions = $model->getActivitylogOptions();
+
+            if (! empty($logOptions->descriptionForEvent)) {
+                $descriptionForEvent = ($logOptions->descriptionForEvent)($action);
+            }
+
+            if (! empty($descriptionForEvent)) {
+                $description = $descriptionForEvent;
+            }
+        }
+
         if ($this->user instanceof Authenticatable && $this->user->id) {
             $description = sprintf(
                 '%s by %s(%s)',
@@ -103,11 +117,6 @@ class ActivityLogger
             $model->activitylogOptions = $model->getActivitylogOptions();
 
             $changes = $model->attributeValuesToBeLogged($eventName);
-
-            // Submitting empty description will cause placeholder replacer to fail.
-            if ($model->getDescriptionForEvent($eventName) === '') {
-                return null;
-            }
 
             if ($model->isLogEmpty($changes) && ! $model->activitylogOptions->submitEmptyLogs) {
                 return null;
