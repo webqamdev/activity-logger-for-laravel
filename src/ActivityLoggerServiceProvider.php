@@ -41,15 +41,6 @@ class ActivityLoggerServiceProvider extends ServiceProvider
      */
     public static function activity(): ActivityLogger
     {
-        $activity = app()->make(ActivityLogger::class);
-        $config = config('activitylogger.enabled', true);
-
-        if ($config === true) {
-            $activity->enableLogging();
-        } elseif ($config === false) {
-            $activity->disableLogging();
-        } // Else use default config
-
-        return $activity;
+        return app()->make(ActivityLogger::class);
     }
 }

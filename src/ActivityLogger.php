@@ -2,13 +2,30 @@
 
 namespace Webqamdev\ActivityLogger;
 
+use Illuminate\Contracts\Config\Repository;
 use Illuminate\Support\Facades\Log;
 use Psr\Log\LoggerInterface;
 use Spatie\Activitylog\ActivityLogger as SpatieActivityLogger;
+use Spatie\Activitylog\ActivityLogStatus;
+use Spatie\Activitylog\CauserResolver;
 use Spatie\Activitylog\Contracts\Activity as ActivityContract;
+use Spatie\Activitylog\LogBatch;
 
 class ActivityLogger extends SpatieActivityLogger
 {
+    public function __construct(Repository $config, LogBatch $batch, CauserResolver $causerResolver)
+    {
+        $logStatus = new ActivityLogStatus($config);
+
+        if (($config['activitylogger.enabled'] ?? false) === true) {
+            $logStatus->enable();
+        } else {
+            $logStatus->disable();
+        }
+
+        parent::__construct($config, $logStatus, $batch, $causerResolver);
+    }
+
     public function log(string $description): ?ActivityContract
     {
         if ($this->logStatus->disabled()) {
