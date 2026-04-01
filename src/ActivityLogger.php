@@ -32,7 +32,7 @@ class ActivityLogger extends SpatieActivityLogger
             return null;
         }
 
-        $activity = $this->activity;
+        $activity = $this->getActivity();
 
         $activity->description = $this->replacePlaceholders(
             $activity->description ?? $description,
@@ -54,7 +54,7 @@ class ActivityLogger extends SpatieActivityLogger
         return $activity;
     }
 
-    protected function getLogger(): LoggerInterface
+    public function getLogger(): LoggerInterface
     {
         return Log::build([
             'driver' => 'daily',
