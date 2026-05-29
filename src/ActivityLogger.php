@@ -3,30 +3,27 @@
 namespace Webqamdev\ActivityLogger;
 
 use Illuminate\Contracts\Config\Repository;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Psr\Log\LoggerInterface;
-use Spatie\Activitylog\ActivityLogger as SpatieActivityLogger;
-use Spatie\Activitylog\ActivityLogStatus;
-use Spatie\Activitylog\CauserResolver;
 use Spatie\Activitylog\Contracts\Activity as ActivityContract;
-use Spatie\Activitylog\LogBatch;
+use Spatie\Activitylog\Support\ActivityLogger as SpatieActivityLogger;
+use Spatie\Activitylog\Support\ActivityLogStatus;
+use Spatie\Activitylog\Support\CauserResolver;
 
 class ActivityLogger extends SpatieActivityLogger
 {
-    public function __construct(Repository $config, LogBatch $batch, CauserResolver $causerResolver)
+    public function __construct(Repository $config, ActivityLogStatus $logStatus, CauserResolver $causerResolver)
     {
-        $logStatus = new ActivityLogStatus($config);
-
-        if (($config['activitylogger.enabled'] ?? false) === true) {
-            $logStatus->enable();
-        } else {
+        if ($config->get('activitylogger.enabled', true) === false) {
             $logStatus->disable();
         }
 
-        parent::__construct($config, $logStatus, $batch, $causerResolver);
+        parent::__construct($config, $logStatus, $causerResolver);
     }
 
-    public function log(string $description): ?ActivityContract
+    public function log(string $description, bool $forceDatabase = false): ?ActivityContract
     {
         if ($this->logStatus->disabled()) {
             return null;
@@ -34,18 +31,19 @@ class ActivityLogger extends SpatieActivityLogger
 
         $activity = $this->getActivity();
 
-        $activity->description = $this->replacePlaceholders(
+        $activity->description = $this->resolveDescription(
             $activity->description ?? $description,
             $activity,
         );
 
-        if (isset($activity->subject) && method_exists($activity->subject, 'tapActivity')) {
-            $this->tap([$activity->subject, 'tapActivity'], $activity->event ?? '');
-        }
+        $this->mutateActivityOnSubject($activity);
 
-        $this->getLogger()->info($description, $activity->properties->toArray());
+        $this->getLogger()->info($description, [
+            'attribute_changes' => $activity->attribute_changes?->toArray() ?? [],
+            'properties' => $activity->properties?->toArray() ?? [],
+        ]);
 
-        if (config('activitylogger.to_database', true) === true) {
+        if ($forceDatabase || config('activitylogger.to_database', true) === true) {
             $activity->save();
         }
 
@@ -63,5 +61,45 @@ class ActivityLogger extends SpatieActivityLogger
             'level' => config('activitylogger.channel.level', 'debug'),
             'permission' => config('activitylogger.channel.permission', 0644),
         ]);
+    }
+
+    protected function resolveDescription(string $description, ActivityContract $activity): string
+    {
+        return preg_replace_callback('/:[a-z0-9._-]+(?<![.])/i', function ($match) use ($activity) {
+            $match = $match[0];
+
+            $attribute = Str::before(Str::after($match, ':'), '.');
+
+            if (! in_array($attribute, ['subject', 'causer', 'properties', 'attribute_changes'])) {
+                return $match;
+            }
+
+            $propertyName = substr($match, strpos($match, '.') + 1);
+
+            $attributeValue = $activity->$attribute;
+
+            if (is_null($attributeValue)) {
+                return $match;
+            }
+
+            return data_get($attributeValue, $propertyName, $match);
+        }, $description);
+    }
+
+    protected function mutateActivityOnSubject(ActivityContract $activity): void
+    {
+        if (! isset($activity->subject) || ! $activity->subject instanceof Model) {
+            return;
+        }
+
+        if (method_exists($activity->subject, 'beforeActivityLogged')) {
+            $activity->subject->beforeActivityLogged($activity, $activity->event ?? '');
+
+            return;
+        }
+
+        if (method_exists($activity->subject, 'tapActivity')) {
+            $activity->subject->tapActivity($activity, $activity->event ?? '');
+        }
     }
 }

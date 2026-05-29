@@ -5,6 +5,7 @@ namespace Webqamdev\ActivityLogger;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
+use Spatie\Activitylog\Support\ActivityLogger as SpatieActivityLogger;
 use Webqamdev\ActivityLogger\Listeners\ActivityLogger as ActivityLoggerListener;
 
 class ActivityLoggerServiceProvider extends ServiceProvider
@@ -14,9 +15,12 @@ class ActivityLoggerServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->publishes([
-            __DIR__.'/../config/activitylogger.php' => config_path('activitylogger.php'),
-        ], 'config');
+        $this->publishes(
+            [
+                __DIR__ . '/../config/activitylogger.php' => config_path('activitylogger.php'),
+            ],
+            'config',
+        );
 
         $this->mergeConfigFrom(__DIR__.'/../config/activitylogger.php', 'activitylogger');
 
