@@ -3,20 +3,23 @@
     "description": "Log every model creation, edition and deletion.",
     "authors": [
         {
-            "name": "Robin Desorme",
-            "email": "rdesorme@webqam.fr"
+            "name": "Robin DESORME",
+            "email": "rdesorme@webqam.fr",
+            "role": "Maintainer"
         },
         {
-            "name": "Thomas Combe",
-            "email": "tcombe@webqam.fr"
+            "name": "Jérémy ARGOUD",
+            "email": "jargoud@webqam.fr",
+            "role": "Maintainer"
         }
     ],
     "require": {
-        "php": "^8.3",
-        "spatie/laravel-activitylog": "^4.5"
+        "php": "^8.4",
+        "illuminate/support": "^12.0 || ^13.0",
+        "spatie/laravel-activitylog": "^5.0"
     },
     "require-dev": {
-      "laravel/pint": "^1.24"
+      "laravel/pint": "^1.29"
     },
     "autoload": {
         "psr-4": {

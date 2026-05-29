@@ -2,15 +2,14 @@
 
 namespace Webqamdev\ActivityLogger\Listeners;
 
+use Closure;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-use Spatie\Activitylog\EventLogBag;
-use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
-use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\Models\Concerns\LogsActivity;
+use Spatie\Activitylog\Support\LogOptions;
 use Webqamdev\ActivityLogger\ActivityLogger as Logger;
 use Webqamdev\ActivityLogger\ActivityLoggerServiceProvider;
 
@@ -104,39 +103,27 @@ class ActivityLogger
         ActivityLogger::purgeDatabase();
     }
 
-    /**
-     * @param  Model|LogsActivity|null  $model
-     */
     protected function getActivityLogger(?Model $model, string $eventName): ?Logger
     {
+        /** @var Model|LogsActivity $model */
         $activityLogger = ActivityLoggerServiceProvider::activity()
             ->performedOn($model)
-            ->causedBy($this->user);
+            ->causedBy($this->user)
+            ->setEvent($eventName);
 
         if (method_exists($model, 'getActivitylogOptions')) {
             $model->activitylogOptions = $model->getActivitylogOptions();
 
-            $changes = $model->attributeValuesToBeLogged($eventName);
+            $changes = $this->buildModelChanges($model, $eventName);
 
-            if ($model->isLogEmpty($changes) && ! $model->activitylogOptions->submitEmptyLogs) {
+            if ($this->shouldSkipModelLog($model, $changes)) {
                 return null;
             }
 
-            // User can define a custom pipelines to mutate, add or remove from changes
-            // each pipe receives the event carrier bag with changes and the model in
-            // question every pipe should manipulate new and old attributes.
-            $event = app(Pipeline::class)
-                ->send(new EventLogBag($eventName, $model, $changes, $model->activitylogOptions))
-                ->through($model::$changesPipes)
-                ->thenReturn();
-
-            /** @var EventLogBag $event */
-            $dirty = $event->changes;
-
-            // Reset log options so the model can be serialized.
             unset($model->activitylogOptions);
+
+            $activityLogger->withChanges($changes);
         } else {
-            // Get only visible dirty values
             $hidden = array_merge(
                 $model?->logAttributesToIgnore ?? [],
                 config('activitylogger.properties_hidden', ['password']),
@@ -146,15 +133,43 @@ class ActivityLogger
                 fn (string $key): bool => ! in_array($key, $hidden),
                 ARRAY_FILTER_USE_KEY,
             );
-        }
 
-        $activityLogger->withProperties($dirty);
-
-        if (method_exists($model, 'tapActivity')) {
-            $activityLogger->tap([$model, 'tapActivity'], $eventName);
+            $activityLogger->withChanges(['attributes' => $dirty]);
         }
 
         return $activityLogger;
+    }
+
+    /**
+     * @param  Model&LogsActivity  $model
+     * @return array<string, mixed>
+     */
+    protected function buildModelChanges(Model $model, string $eventName): array
+    {
+        /** @var Closure(string): array<string, mixed> $buildChanges */
+        $buildChanges = Closure::bind(
+            fn (string $event): array => $this->buildChanges($event),
+            $model,
+            $model,
+        );
+
+        return $buildChanges($eventName);
+    }
+
+    /**
+     * @param  Model&LogsActivity  $model
+     * @param  array<string, mixed>  $changes
+     */
+    protected function shouldSkipModelLog(Model $model, array $changes): bool
+    {
+        /** @var Closure(array<string, mixed>): bool $shouldSkipEmptyLog */
+        $shouldSkipEmptyLog = Closure::bind(
+            fn (array $changes): bool => $this->shouldSkipEmptyLog($changes),
+            $model,
+            $model,
+        );
+
+        return $shouldSkipEmptyLog($changes);
     }
 
     protected static function purgeDatabase(): void

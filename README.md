@@ -36,8 +36,10 @@ php artisan vendor:publish --provider="Webqamdev\ActivityLogger\ActivityLoggerSe
 ### Model Configuration & Detailed Logs
 
 To enable detailed logging and ensure the logs follow the standard Spatie format (recording changes with `old` and
-`attributes` values), your model must use the `Spatie\Activitylog\Traits\LogsActivity` trait and implement the
-`getActivitylogOptions` method.
+`attributes` values in `attribute_changes`), your model must use the `Spatie\Activitylog\Models\Concerns\LogsActivity`
+trait and implement the `getActivitylogOptions` method.
+
+Set `$enableLoggingModelsEvents = false` on the model to avoid duplicate logs (this package already listens to Eloquent events).
 
 This is **necessary** to achieve the following structure in your logs (showing what changed):
 
@@ -58,12 +60,14 @@ Example:
 
 ```php
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Activitylog\Traits\LogsActivity;
-use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Models\Concerns\LogsActivity;
+use Spatie\Activitylog\Support\LogOptions;
 
 class User extends Model
 {
     use LogsActivity;
+
+    public bool $enableLoggingModelsEvents = false;
 
     /**
      * Configure the activity logging rules.
@@ -71,7 +75,7 @@ class User extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logAll()       // Log all attributes...
+            ->logAll()        // Log all attributes...
             ->logOnlyDirty(); // ...but only store changes
     }
 }
@@ -131,7 +135,7 @@ Please see [UPGRADING](UPGRADING.md) for details.
 
 ## About
 
-This package using Laravel 5.8 is a plugin for auto-logging activities.
+This package requires Laravel 12+ and PHP 8.4+. It is a plugin for auto-logging model activities.
 
 Gitlab
 repository : [Activity logger for Laravel](https://gitlab.webqam.fr/webqam/laravel-modules/activity-logger-for-laravel)
