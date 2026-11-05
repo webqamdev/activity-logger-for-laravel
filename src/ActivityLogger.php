@@ -14,6 +14,8 @@ use Spatie\Activitylog\Support\CauserResolver;
 
 class ActivityLogger extends SpatieActivityLogger
 {
+    public const string CHANNEL = 'activitylogger';
+
     public function __construct(Repository $config, ActivityLogStatus $logStatus, CauserResolver $causerResolver)
     {
         if ($config->get('activitylogger.enabled', true) === false) {
@@ -54,6 +56,10 @@ class ActivityLogger extends SpatieActivityLogger
 
     public function getLogger(): LoggerInterface
     {
+        if (config('logging.channels.'.self::CHANNEL) !== null) {
+            return Log::channel(self::CHANNEL);
+        }
+
         return Log::build([
             'driver' => 'daily',
             'path' => config('activitylogger.channel.path', storage_path('logs/activity.log')),

@@ -24,7 +24,8 @@ return [
     'days_before_delete_log' => env('DAYS_BEFORE_DELETE_LOG', 90),
 
     /*
-     * Configure logging channel. Driver is forced to 'daily'.
+     * Daily file logging settings, used only when the app does not declare
+     * an 'activitylogger' channel in config/logging.php.
      */
 
     'channel' => [

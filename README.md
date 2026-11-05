@@ -129,6 +129,32 @@ Add `channel.permission` to your `config/activitylogger.php` file like this exem
 ],
 ```
 
+### Log to a custom channel
+
+By default, activities are written to a `daily` log file. To use your own channel instead, declare an
+`activitylogger` channel in your app's `config/logging.php`. For example, to write to stderr:
+
+```php
+use Monolog\Formatter\JsonFormatter;
+use Monolog\Handler\StreamHandler;
+
+'channels' => [
+    // ...
+    'activitylogger' => [
+        'driver' => 'monolog',
+        'name' => 'activitylogger',
+        'handler' => StreamHandler::class,
+        'handler_with' => [
+            'stream' => 'php://stderr',
+        ],
+        'formatter' => JsonFormatter::class,
+        'level' => 'debug',
+    ],
+],
+```
+
+When this channel exists, the `channel.*` keys of `config/activitylogger.php` are ignored.
+
 ## Upgrading
 
 Please see [UPGRADING](UPGRADING.md) for details.
