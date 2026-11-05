@@ -2,9 +2,6 @@
 
 return [
 
-    // Fully qualified namespace of the User model
-    'user_model' => config('auth.providers.users.model', 'App\Models\User'),
-
     /*
      * If set to false, no activities will be saved.
      */
