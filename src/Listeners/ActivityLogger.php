@@ -68,6 +68,11 @@ class ActivityLogger
             return;
         }
 
+        // restore() also fires "updated": only log "restored".
+        if ($action === 'updated' && $this->isRestoring($model)) {
+            return;
+        }
+
         $activityLogger = $this->getActivityLogger($model, $action);
 
         if (is_null($activityLogger)) {
@@ -169,6 +174,17 @@ class ActivityLogger
         );
 
         return $buildChanges($eventName);
+    }
+
+    protected function isRestoring(Model $model): bool
+    {
+        if (! method_exists($model, 'getDeletedAtColumn')) {
+            return false;
+        }
+
+        $column = $model->getDeletedAtColumn();
+
+        return $model->isDirty($column) && $model->getAttribute($column) === null;
     }
 
     protected static function purgeDatabase(): void
