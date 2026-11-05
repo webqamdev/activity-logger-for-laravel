@@ -1,3 +1,41 @@
+## From webqamdev/activity-logger v5 to v6
+
+```bash
+composer require webqamdev/activity-logger "^6.0.0"
+```
+
+### Models configuration
+
+Replace Spatie's trait with the package one, and remove `$enableLoggingModelsEvents = false` if present (it conflicts
+with the trait property and triggers a fatal error):
+
+```diff
+-use Spatie\Activitylog\Models\Concerns\LogsActivity;
++use Webqamdev\ActivityLogger\Concerns\LogsActivity;
+
+ class YourModel extends Model
+ {
+     use LogsActivity;
+-
+-    public bool $enableLoggingModelsEvents = false;
+```
+
+Models still using Spatie's trait keep working, but each event is logged twice (once by Spatie, once by this package).
+
+With the package trait, the model's `LogOptions` are now honoured: `useLogName()`, `dontLogIfAttributesChangedOnly()`
+and `disableLogging()`.
+
+### Removed
+
+- The container binding of `Illuminate\Contracts\Auth\Authenticatable` to the user model. It overrode Laravel's own
+  binding (the authenticated user), so activities had no causer. If your app relied on it, bind it yourself.
+- The `user_model` config key: remove it from your published `config/activitylogger.php`.
+
+### Behaviour changes
+
+- `restore()` logs a single `restored` activity instead of `updated` + `restored`.
+- The activity model set in `activitylog.activity_model` is used to detect activities and to purge old logs.
+
 ## From webqamdev/activity-logger v4 to v5 (Spatie activitylog v5)
 
 ```bash
