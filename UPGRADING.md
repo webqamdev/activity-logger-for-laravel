@@ -20,7 +20,9 @@ with the trait property and triggers a fatal error):
 -    public bool $enableLoggingModelsEvents = false;
 ```
 
-Models still using Spatie's trait keep working, but each event is logged twice (once by Spatie, once by this package).
+Models still using Spatie's trait are logged twice (once by Spatie, once by this package), and on `updated` the
+package's activity has every `old` value set to `null`, because Spatie's listener runs first and consumes the original
+attributes. Migrate every model to the package trait.
 
 With the package trait, the model's `LogOptions` are now honoured: `useLogName()`, `dontLogIfAttributesChangedOnly()`
 and `disableLogging()`.
