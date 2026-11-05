@@ -36,10 +36,11 @@ php artisan vendor:publish --provider="Webqamdev\ActivityLogger\ActivityLoggerSe
 ### Model Configuration & Detailed Logs
 
 To enable detailed logging and ensure the logs follow the standard Spatie format (recording changes with `old` and
-`attributes` values in `attribute_changes`), your model must use the `Spatie\Activitylog\Models\Concerns\LogsActivity`
+`attributes` values in `attribute_changes`), your model must use the `Webqamdev\ActivityLogger\Concerns\LogsActivity`
 trait and implement the `getActivitylogOptions` method.
 
-Set `$enableLoggingModelsEvents = false` on the model to avoid duplicate logs (this package already listens to Eloquent events).
+This trait wraps Spatie's `LogsActivity` and disables Spatie's own event logging, so each event is logged only once
+(by this package's listener).
 
 This is **necessary** to achieve the following structure in your logs (showing what changed):
 
@@ -60,14 +61,12 @@ Example:
 
 ```php
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
+use Webqamdev\ActivityLogger\Concerns\LogsActivity;
 
 class User extends Model
 {
     use LogsActivity;
-
-    public bool $enableLoggingModelsEvents = false;
 
     /**
      * Configure the activity logging rules.

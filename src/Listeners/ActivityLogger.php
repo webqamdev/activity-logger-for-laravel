@@ -114,11 +114,13 @@ class ActivityLogger
         if (method_exists($model, 'getActivitylogOptions')) {
             $changes = $this->buildModelChanges($model, $eventName);
 
-            if ($this->shouldSkipModelLog($model, $changes)) {
+            if ($changes === null) {
                 return null;
             }
 
-            $activityLogger->withChanges($changes);
+            $activityLogger
+                ->useLog($model->getLogNameToUse())
+                ->withChanges($changes);
         } else {
             $hidden = array_merge(
                 $model?->logAttributesToIgnore ?? [],
@@ -137,35 +139,36 @@ class ActivityLogger
     }
 
     /**
+     * Apply the model's LogOptions like Spatie does, then build the changes.
+     *
      * @param  Model&LogsActivity  $model
-     * @return array<string, mixed>
+     * @return array<string, mixed>|null null when the event must not be logged
      */
-    protected function buildModelChanges(Model $model, string $eventName): array
+    protected function buildModelChanges(Model $model, string $eventName): ?array
     {
-        /** @var Closure(string): array<string, mixed> $buildChanges */
+        /** @var Closure(string): ?array<string, mixed> $buildChanges */
         $buildChanges = Closure::bind(
-            fn (string $event): array => $this->buildChanges($event),
+            function (string $event): ?array {
+                $this->activitylogOptions = $this->getActivitylogOptions();
+
+                // Package trait disables shouldLogEvent() and exposes Spatie's one under an alias.
+                $shouldLog = method_exists($this, 'shouldLogActivityEvent')
+                    ? $this->shouldLogActivityEvent($event)
+                    : $this->shouldLogEvent($event);
+
+                if (! $shouldLog) {
+                    return null;
+                }
+
+                $changes = $this->buildChanges($event);
+
+                return $this->shouldSkipEmptyLog($changes) ? null : $changes;
+            },
             $model,
             $model,
         );
 
         return $buildChanges($eventName);
-    }
-
-    /**
-     * @param  Model&LogsActivity  $model
-     * @param  array<string, mixed>  $changes
-     */
-    protected function shouldSkipModelLog(Model $model, array $changes): bool
-    {
-        /** @var Closure(array<string, mixed>): bool $shouldSkipEmptyLog */
-        $shouldSkipEmptyLog = Closure::bind(
-            fn (array $changes): bool => $this->shouldSkipEmptyLog($changes),
-            $model,
-            $model,
-        );
-
-        return $shouldSkipEmptyLog($changes);
     }
 
     protected static function purgeDatabase(): void
