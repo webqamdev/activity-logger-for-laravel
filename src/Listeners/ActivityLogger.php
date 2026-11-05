@@ -7,8 +7,9 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-use Spatie\Activitylog\Models\Activity;
+use Spatie\Activitylog\Contracts\Activity as ActivityContract;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
+use Spatie\Activitylog\Support\Config;
 use Spatie\Activitylog\Support\LogOptions;
 use Webqamdev\ActivityLogger\ActivityLogger as Logger;
 use Webqamdev\ActivityLogger\ActivityLoggerServiceProvider;
@@ -64,7 +65,7 @@ class ActivityLogger
         /** @var Model $model */
         $model = array_pop($models);
 
-        if ($model instanceof Activity) {
+        if ($model instanceof ActivityContract) {
             return;
         }
 
@@ -200,9 +201,11 @@ class ActivityLogger
         );
 
         if (config('activitylogger.to_database', true)) {
-            Activity::query()
+            $activity = Config::activityModelInstance();
+
+            $activity->newQuery()
                 ->where(
-                    Activity::CREATED_AT,
+                    $activity->getCreatedAtColumn(),
                     '<=',
                     now()->subDay(config('activitylogger.days_before_delete_log')),
                 )
