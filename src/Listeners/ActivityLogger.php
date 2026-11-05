@@ -112,15 +112,11 @@ class ActivityLogger
             ->setEvent($eventName);
 
         if (method_exists($model, 'getActivitylogOptions')) {
-            $model->activitylogOptions = $model->getActivitylogOptions();
-
             $changes = $this->buildModelChanges($model, $eventName);
 
             if ($this->shouldSkipModelLog($model, $changes)) {
                 return null;
             }
-
-            unset($model->activitylogOptions);
 
             $activityLogger->withChanges($changes);
         } else {
