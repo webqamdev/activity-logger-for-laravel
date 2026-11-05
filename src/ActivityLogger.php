@@ -60,12 +60,14 @@ class ActivityLogger extends SpatieActivityLogger
             return Log::channel(self::CHANNEL);
         }
 
+        // Defaults cover published configs from older versions: mergeConfigFrom() does not merge nested keys.
         return Log::build([
             'driver' => 'daily',
-            'path' => config('activitylogger.channel.path', storage_path('logs/activity.log')),
-            'days' => config('activitylogger.channel.days', 14),
-            'level' => config('activitylogger.channel.level', 'debug'),
-            'permission' => config('activitylogger.channel.permission', 0644),
+            'path' => storage_path('logs/activity.log'),
+            'days' => 14,
+            'level' => 'debug',
+            'permission' => 0644,
+            ...config('activitylogger.channel', []),
         ]);
     }
 

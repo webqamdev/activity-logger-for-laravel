@@ -24,14 +24,16 @@ return [
     'days_before_delete_log' => env('DAYS_BEFORE_DELETE_LOG', 90),
 
     /*
-     * Daily file logging settings, used only when the app does not declare
-     * an 'activitylogger' channel in config/logging.php.
+     * On-demand channel configuration passed to Log::build(), used only when
+     * the app does not declare an 'activitylogger' channel in config/logging.php.
      */
 
     'channel' => [
-        'path'  => storage_path('logs/activity.log'),
-        'level' => 'debug',
-        'days'  => env('DAYS_BEFORE_DELETE_LOG', 90),
+        'driver'     => 'daily',
+        'path'       => storage_path('logs/activity.log'),
+        'level'      => 'debug',
+        'days'       => env('DAYS_BEFORE_DELETE_LOG', 90),
+        'permission' => 0644,
     ],
 
     /*
