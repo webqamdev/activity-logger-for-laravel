@@ -29,10 +29,10 @@ return [
      */
 
     'channel' => [
-        'driver'     => 'daily',
-        'path'       => storage_path('logs/activity.log'),
-        'level'      => 'debug',
-        'days'       => env('DAYS_BEFORE_DELETE_LOG', 90),
+        'driver' => 'daily',
+        'path' => storage_path('logs/activity.log'),
+        'level' => 'debug',
+        'days' => env('DAYS_BEFORE_DELETE_LOG', 90),
         'permission' => 0644,
     ],
 
